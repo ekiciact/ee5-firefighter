@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+ 
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../js/navbar.js"></script>
+    
+
+   
+</head>
+<body>
+    <div id="navbar" class="navbar">
+        <a id="home" href="#">Home</a>
+        <a id="heatmap" href="#">Heatmap</a>
+        <a id="everageheat" href="#">Everage Heat</a>
+        <a id="timeheat" href="#">Heat-Time Graph</a>
+        <a id="table" href="#">Table</a>
+        <a id="sim" href="#">Simulation</a>
+         
+        <div class="subnav">
+          <button class="subnavbtn">Sessions<i class="fa fa-caret-down"></i></button>
+          <div id="sessions" class="subnav-content">
+            
+          </div>
+        </div> 
+        
+        
+        <a id="createNewUser" href="#">Create New User</a>
+        <a id="login" href="#">Login</a>
+        <a id="logout" href="#">Logout</a>
+        <input placeholder="User Password" type="password" id="userPassword"/>
+        <input placeholder="User Name" type="text" id="userName"/>
+      
+      </div>
+
+    <h3>Session Creator</h3>
+    <p>Session Id:</p>
+    <input placeholder="0" min="0" type="number" id="sessionInput" name="sessionInput"/>
+    <p></p>
+    <button onclick="sessionAdd()" id="btnSessionAdd">ADD SESSION</button>
+    <br><br><br><br>
+    <h3>Simulation Creator</h3>
+    <p>Simulation Id:</p>
+    <input placeholder="0" min="0" type="number" id="simidInput" name="simidInput"/>
+    <p></p>
+    <p>Number of Data:</p>
+    <input placeholder="0 means infinite simulation" min="1" type="number" id="numberOfData" name="numberOfData"/>
+    <p></p>
+    <p>Cycle Range:</p>
+    <input placeholder="5000" min="5000" type="number" id="cycleOfData" name="cycleOfData"/>
+    <p></p>
+    <button onclick="simulationStart()" id="btnStart">START SIMULATION</button><button onclick="simulationStop()" id="btnEnd">STOP SIMULATION</button>
+    <p></p>
+    <p id="simulationText"><b>Simulation Info: </b><br> Simulation is not running!</p>
+    <script src='../js/sim.js'></script>
+</body>
+</html>

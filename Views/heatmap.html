@@ -1,0 +1,331 @@
+  
+    <!-- Resources -->
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../js/navbar.js"></script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    
+    
+    <!-- Chart code -->
+    <script>
+      if(window.localStorage.getItem("isLoggedIn") == 1)
+      {
+        if(window.localStorage.getItem("sessionId") == undefined){
+    alert("Plese select session")
+
+      }
+      else
+      {
+
+    const databaseUrl = "https://studev.groept.be/api/a19fire4/getlast10/"+window.localStorage.getItem("sessionId");
+    var json_obj;
+    var lengthOfJson = 0;
+    var totalValue = 0;
+    var average = 0;
+    var counter = 0;
+    var dataChanged = true;
+    var sensorValues = [
+        sensor1Values = [],
+        sensor2Values = [],
+        sensor3Values = [],
+        sensor4Values = [],
+        sensor5Values = [],
+        sensor6Values = [],
+        sensor7Values = [],
+        sensor8Values = [],
+        sensor9Values = [],
+        sensor10Values = [],
+        ];
+    var allLastValues = [];
+    var allLastTotal = 0;
+    var sersorColors = [];
+    var colorPicker;
+
+    function retrievData() {
+        fetch(databaseUrl)
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+      json_obj = data;
+    return json_obj;
+  })
+  .then((json_obj) => {
+
+    for (counter; counter < json_obj.length; counter++) {
+
+switch (json_obj[counter].sensor_id) {
+  case "1":
+    sensor1Values.push(json_obj[counter].value);
+    break;
+  case "2":
+    sensor2Values.push(json_obj[counter].value);
+    break;
+  case "3":
+    sensor3Values.push(json_obj[counter].value);
+    break;
+  case "4":
+    sensor4Values.push(json_obj[counter].value);
+    break;
+  case "5":
+    sensor5Values.push(json_obj[counter].value);
+    break;
+  case "6":
+    sensor6Values.push(json_obj[counter].value);
+    break;
+  case "7":
+    sensor7Values.push(json_obj[counter].value);
+    break;
+  case "8":
+    sensor8Values.push(json_obj[counter].value);
+    break;
+  case "9":
+    sensor9Values.push(json_obj[counter].value);
+    break;
+  case "10":
+    sensor10Values.push(json_obj[counter].value);
+    break;
+
+  default:
+
+};
+
+};
+    allLastValues = [];
+    allLastTotal = 0;
+    allLastBiggest = 0;
+    allLastSmallest = 99999;
+    for (let index = 0; index < 10; index++) {
+        allLastValues.push(parseInt(sensorValues[index][sensorValues[index].length - 1]));
+        allLastTotal+=parseInt(sensorValues[index][sensorValues[index].length - 1]);
+    }
+    // define colors
+    var colors = {
+        critical: "#ca0101",
+        bad: "#e17a2d",
+        medium: "#e1d92d",
+        good: "#5dbe24",
+        verygood: "#0b7d03"
+    };
+    for (let index = 0; index < 10; index++) {
+      if (allLastValues[index]<allLastSmallest) {
+        allLastSmallest = allLastValues[index];
+    }  if (allLastValues[index]>allLastBiggest){
+        allLastBiggest = allLastValues[index];
+    }
+      
+    }
+    
+    colorPicker = (allLastBiggest - allLastSmallest)/5;
+
+    sersorColors = [];
+    for (let index = 0; index < 10; index++) {
+        if (allLastValues[index] < colorPicker + allLastSmallest) {
+            sersorColors.push("#0b7d03");
+        } else if (allLastValues[index] < colorPicker*2 + allLastSmallest) {
+            sersorColors.push("#5dbe24");
+        } else if (allLastValues[index] < colorPicker*3 + allLastSmallest) {
+            sersorColors.push("#e1d92d");
+        }
+        else if (allLastValues[index] < colorPicker*4 + allLastSmallest) {
+            sersorColors.push("#e17a2d");
+        } else  {
+            sersorColors.push("#ca0101");
+        }       
+    }
+    
+    if (lengthOfJson == json_obj.length) {
+        dataChanged = false;
+    } else {
+        dataChanged = true;
+        lengthOfJson = json_obj.length
+    }
+    return dataChanged;
+  })
+  .then((dataChanged) => {
+    
+    if (dataChanged == true) { 
+    am4core.ready(function() {
+    
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    var chart = am4core.create("chartdiv", am4charts.XYChart);
+    chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+    
+    chart.maskBullets = false;
+    
+    var xAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+    var yAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+    
+    xAxis.dataFields.category = "x";
+    yAxis.dataFields.category = "y";
+    
+    xAxis.renderer.grid.template.disabled = true;
+    xAxis.renderer.minGridDistance = 40;
+    
+    yAxis.renderer.grid.template.disabled = true;
+    yAxis.renderer.inversed = true;
+    yAxis.renderer.minGridDistance = 30;
+    
+    var series = chart.series.push(new am4charts.ColumnSeries());
+    series.dataFields.categoryX = "x";
+    series.dataFields.categoryY = "y";
+    series.dataFields.value = "value";
+    series.sequencedInterpolation = true;
+    series.defaultState.transitionDuration = 2000;
+    
+    // Set up column appearance
+    var column = series.columns.template;
+    column.strokeWidth = 2;
+    column.strokeOpacity = 1;
+    column.stroke = am4core.color("#ffffff");
+    column.tooltipText = "{x}, {y}: {value.workingValue.formatNumber('#.')}";
+    column.width = am4core.percent(100);
+    column.height = am4core.percent(100);
+    column.column.cornerRadius(6, 6, 6, 6);
+    column.propertyFields.fill = "color";
+    
+    // Set up bullet appearance
+    var bullet1 = series.bullets.push(new am4charts.CircleBullet());
+
+    bullet1.circle.fill = am4core.color("#000");
+    bullet1.circle.strokeWidth = 0;
+    bullet1.circle.fillOpacity = 0.7;
+    bullet1.interactionsEnabled = false;
+    
+    var bullet2 = series.bullets.push(new am4charts.LabelBullet());
+    bullet2.label.text = "{value}";
+    bullet2.label.fill = am4core.color("#fff");
+    bullet2.zIndex = 1;
+    bullet2.fontSize = 11;
+    bullet2.interactionsEnabled = false;
+
+
+    
+    chart.data = [{
+        "y": "Sensors Above",
+        "x": "5th and 10th",
+        "color": sersorColors[9],
+        "value": allLastValues[9],
+        
+
+    }, {
+        "y": "Sensors Above",
+        "x": "4th and 9th",
+        "color": sersorColors[8],
+        "value": allLastValues[8]
+    }, 
+    
+    {
+        "y": "Sensors Above",
+        "x": "3rd and 8th",
+        "color": sersorColors[7],
+        "value": allLastValues[7]
+    }, {
+        "y": "Sensors Above",
+        "x": "2th and 7th",
+        "color": sersorColors[6],
+        "value": allLastValues[6]
+    }, 
+    
+    {
+        "y": "Sensors Above",
+        "x": "1st and 6nd",
+        "color": sersorColors[5],
+        "value": allLastValues[5]
+    }, {
+        "y": "Sensors Below",
+        "x": "5th and 10th",
+        "color": sersorColors[4],
+        "value": allLastValues[4]
+    }, 
+    
+    {
+        "y": "Sensors Below",
+        "x": "4th and 9th",
+        "color": sersorColors[3],
+        "value": allLastValues[3]
+    }, {
+        "y": "Sensors Below",
+        "x": "3rd and 8th",
+        "color": sersorColors[2],
+        "value": allLastValues[2]
+    }, 
+    
+    {
+        "y": "Sensors Below",
+        "x": "2th and 7th",
+        "color": sersorColors[1],
+        "value": allLastValues[1]
+    }, {
+        "y": "Sensors Below",
+        "x": "1st and 6nd",
+        "color": sersorColors[0],
+        "value": allLastValues[0]
+    }, 
+    ];
+    
+    var baseWidth = Math.min(chart.plotContainer.maxWidth, chart.plotContainer.maxHeight);
+    var maxRadius = baseWidth / Math.sqrt(chart.data.length) / 2 - 2; // 2 is jast a margin
+    series.heatRules.push({ min: 10, max: maxRadius, property: "radius", target: bullet1.circle });
+    
+    
+    chart.plotContainer.events.on("maxsizechanged", function() {
+        var side = Math.min(chart.plotContainer.maxWidth, chart.plotContainer.maxHeight);
+        bullet1.circle.clones.each(function(clone) {
+            clone.scale = side / baseWidth;
+        })
+    })
+    
+    }); // end am4core.ready()
+    
+}
+
+  });
+};
+retrievData();
+setInterval(function() {
+    retrievData();
+    }, 5000);
+  }
+}
+  else
+  {
+    alert("Plese first login");
+  }
+    
+    </script>
+    
+    <!-- HTML -->
+    <div id="navbar" class="navbar">
+      <a id="home" href="#">Home</a>
+      <a id="heatmap" href="#">Heatmap</a>
+      <a id="everageheat" href="#">Everage Heat</a>
+      <a id="timeheat" href="#">Heat-Time Graph</a>
+      <a id="table" href="#">Table</a>
+      <a id="sim" href="#">Simulation</a>
+       
+      <div class="subnav">
+        <button class="subnavbtn">Sessions<i class="fa fa-caret-down"></i></button>
+        <div id="sessions" class="subnav-content">
+          
+        </div>
+      </div> 
+      
+      
+      <a id="createNewUser" href="#">Create New User</a>
+      <a id="login" href="#">Login</a>
+      <a id="logout" href="#">Logout</a>
+      <input placeholder="User Password" type="password" id="userPassword"/>
+      <input placeholder="User Name" type="text" id="userName"/>
+    
+    </div>
+
+    <div id="chartdiv"></div>
+    

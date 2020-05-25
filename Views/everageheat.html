@@ -1,0 +1,157 @@
+
+    <!-- Resources -->
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../js/navbar.js"></script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    
+    <!-- Chart code -->
+    <script>
+      if(window.localStorage.getItem("isLoggedIn") == 1)
+      {
+        if(window.localStorage.getItem("sessionId") == undefined){
+    alert("Plese select session")
+
+      }
+      else
+      {
+
+    const databaseUrl = "https://studev.groept.be/api/a19fire4/getlast10/"+window.localStorage.getItem("sessionId");
+    var json_obj;
+    var totalValue = 0;
+    var average = 0;
+    var counter = 0;
+
+    function retrievData() {
+        fetch(databaseUrl)
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+      json_obj = data;
+    return json_obj;
+  })
+  .then((json_obj) => {
+    for (counter; counter < json_obj.length; counter++) {
+        totalValue += parseInt(json_obj[counter].value);  
+               
+    }
+    return totalValue;
+  })
+  .then((totalValue) => {
+    average = totalValue/json_obj.length;
+    return average;
+  });
+};
+   retrievData();
+
+    
+    
+
+   
+
+    am4core.ready(function() {
+    
+    // Themes begin
+    am4core.useTheme(am4themes_dark);
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+    
+    
+    
+    // create chart
+    var chart = am4core.create("chartdiv", am4charts.GaugeChart);
+    chart.innerRadius = -15;
+    
+    var axis = chart.xAxes.push(new am4charts.ValueAxis());
+    axis.min = 0;
+    axis.max = 100*20;
+    axis.strictMinMax = true;
+    
+    var colorSet = new am4core.ColorSet();
+    
+    var gradient = new am4core.LinearGradient();
+    gradient.stops.push({color:am4core.color("green")})
+    gradient.stops.push({color:am4core.color("yellow")})
+    gradient.stops.push({color:am4core.color("red")})
+    
+    axis.renderer.line.stroke = gradient;
+    axis.renderer.line.strokeWidth = 15;
+    axis.renderer.line.strokeOpacity = 1;
+    
+    axis.renderer.grid.template.disabled = true;
+    
+    var hand = chart.hands.push(new am4charts.ClockHand());
+    hand.radius = am4core.percent(97);
+    
+    setInterval(function() {
+        retrievData();
+        hand.showValue(average, 1000, am4core.ease.cubicOut);
+        label.text = Math.round(hand.value).toString();
+    }, 2000);
+
+
+    var labelList = new am4core.ListTemplate(new am4core.Label());
+labelList.template.isMeasured = true;
+labelList.template.background.strokeWidth = 2;
+labelList.template.fontSize = 25;
+labelList.template.padding(10, 20, 10, 20);
+labelList.template.y = am4core.percent(50);
+labelList.template.horizontalCenter = "middle";
+
+var label = labelList.create();
+label.parent = chart.chartContainer;
+label.x = am4core.percent(40);
+label.background.stroke = chart.colors.getIndex(0);
+label.fill = chart.colors.getIndex(0);
+label.text = "0";
+    
+    
+    
+    }); 
+    // end am4core.ready()
+    
+
+    document.addEventListener('DOMContentLoaded', function() 
+    {
+        document.querySelector('[aria-labelledby="id-71-title"]').setAttribute("style", "display: none;");
+    });
+  }
+}
+  else
+  {
+    alert("Plese first login");
+  }
+    </script>
+    
+    <!-- HTML -->
+
+    <div id="navbar" class="navbar">
+      <a id="home" href="#">Home</a>
+      <a id="heatmap" href="#">Heatmap</a>
+      <a id="everageheat" href="#">Everage Heat</a>
+      <a id="timeheat" href="#">Heat-Time Graph</a>
+      <a id="table" href="#">Table</a>
+      <a id="sim" href="#">Simulation</a>
+       
+      <div class="subnav">
+        <button class="subnavbtn">Sessions<i class="fa fa-caret-down"></i></button>
+        <div id="sessions" class="subnav-content">
+          
+        </div>
+      </div> 
+      
+      
+      <a id="createNewUser" href="#">Create New User</a>
+      <a id="login" href="#">Login</a>
+      <a id="logout" href="#">Logout</a>
+      <input placeholder="User Password" type="password" id="userPassword"/>
+      <input placeholder="User Name" type="text" id="userName"/>
+    
+    </div>
+    
+
+    <div id="chartdiv"></div>

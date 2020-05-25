@@ -1,0 +1,280 @@
+
+<!-- Resources -->
+<link rel="stylesheet" href="../css/navbar.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="../js/navbar.js"></script>
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/dark.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+  if(window.localStorage.getItem("isLoggedIn") == 1)
+      {
+        if(window.localStorage.getItem("sessionId") == undefined){
+    alert("Plese select session")
+
+      }
+      else
+      {
+
+const databaseUrl = "https://studev.groept.be/api/a19fire4/getsensordata/"+window.localStorage.getItem("sessionId");
+    var json_obj;
+    var lengthOfJson = 0;
+    var counter = 0;
+    var dataChanged = true;
+    var rawDataCounter = 0;
+    var rawDataArray = [];
+    var rawData = {};
+
+    function retrievData() {
+        fetch(databaseUrl)
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+      json_obj = data;
+    return json_obj;
+  })
+  .then((json_obj) => {
+
+    for (counter; counter < json_obj.length; counter++) {
+
+      if (rawDataCounter < 10) {
+        
+      switch (json_obj[counter].sensor_id) {
+        case "1":
+        var min = Math.floor(json_obj[counter].time/60);
+        var sec = (json_obj[counter].time)%60;
+        var times = min+":"+sec;
+        rawData.time = times;
+        
+        rawData.sersor1 = (json_obj[counter].value);
+          break;
+        case "2":
+        rawData.sersor2 = (json_obj[counter].value);
+          break;
+        case "3":
+        rawData.sersor3 = (json_obj[counter].value);
+          break;
+        case "4":
+        rawData.sersor4 = (json_obj[counter].value);
+          break;
+        case "5":
+        rawData.sersor5 = (json_obj[counter].value);
+          break;
+        case "6":
+        rawData.sersor6 = (json_obj[counter].value);
+          break;
+        case "7":
+        rawData.sersor7 = (json_obj[counter].value);
+          break;
+        case "8":
+        rawData.sersor8 = (json_obj[counter].value);
+          break;
+        case "9":
+        rawData.sersor9 = (json_obj[counter].value);
+          break;
+        case "10":
+        rawData.sersor10 = (json_obj[counter].value);
+        
+          break;
+
+        default:
+
+};
+rawDataCounter++;
+      } else {
+        rawDataArray.push(rawData);
+        rawData = {};
+        rawDataCounter = 0;
+      
+      }
+      
+
+};
+
+
+    
+/*
+    for (counter; counter < json_obj.length; counter++) {
+        totalValue += parseInt(json_obj[counter].value);  
+               
+    }*/
+    if (lengthOfJson == json_obj.length) {
+        dataChanged = false;
+    } else {
+        dataChanged = true;
+        lengthOfJson = json_obj.length
+    }
+    return rawDataArray;
+  })
+  .then((rawDataArray) => {
+    am4core.ready(function() {
+
+// Themes begin
+
+am4core.useTheme(am4themes_dark);
+am4core.useTheme(am4themes_animated);
+    // Themes end
+
+
+// Create chart instance
+
+
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.data = rawDataArray;
+
+// Create category axis
+var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "time";
+categoryAxis.renderer.opposite = false;
+
+// Create value axis
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis.renderer.inversed = false;
+valueAxis.title.text = "Heat";
+valueAxis.renderer.minLabelPosition = 0.01;
+
+
+// Create series
+
+
+var series1 = chart.series.push(new am4charts.LineSeries());
+series1.dataFields.valueY = "sersor1";
+series1.dataFields.categoryX = "time";
+series1.name = 'Sensor 1';
+series1.strokeWidth = 3;
+series1.bullets.push(new am4charts.CircleBullet());
+series1.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series1.legendSettings.valueText = "{valueY}";
+
+var series2 = chart.series.push(new am4charts.LineSeries());
+series2.dataFields.valueY = "sersor2";
+series2.dataFields.categoryX = "time";
+series2.name = 'Sensor 2';
+series2.strokeWidth = 3;
+series2.bullets.push(new am4charts.CircleBullet());
+series2.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series2.legendSettings.valueText = "{valueY}";
+
+var series3 = chart.series.push(new am4charts.LineSeries());
+series3.dataFields.valueY = "sersor3";
+series3.dataFields.categoryX = "time";
+series3.name = 'Sensor 3';
+series3.strokeWidth = 3;
+series3.bullets.push(new am4charts.CircleBullet());
+series3.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series3.legendSettings.valueText = "{valueY}";
+
+var series4 = chart.series.push(new am4charts.LineSeries());
+series4.dataFields.valueY = "sersor4";
+series4.dataFields.categoryX = "time";
+series4.name = 'Sensor 4';
+series4.strokeWidth = 3;
+series4.bullets.push(new am4charts.CircleBullet());
+series4.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series4.legendSettings.valueText = "{valueY}";
+
+var series5 = chart.series.push(new am4charts.LineSeries());
+series5.dataFields.valueY = "sersor5";
+series5.dataFields.categoryX = "time";
+series5.name = 'Sensor 5';
+series5.strokeWidth = 3;
+series5.bullets.push(new am4charts.CircleBullet());
+series5.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series5.legendSettings.valueText = "{valueY}";
+
+var series6 = chart.series.push(new am4charts.LineSeries());
+series6.dataFields.valueY = "sersor6";
+series6.dataFields.categoryX = "time";
+series6.name = 'Sensor 6';
+series6.strokeWidth = 3;
+series6.bullets.push(new am4charts.CircleBullet());
+series6.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series6.legendSettings.valueText = "{valueY}";
+
+var series7 = chart.series.push(new am4charts.LineSeries());
+series7.dataFields.valueY = "sersor7";
+series7.dataFields.categoryX = "time";
+series7.name = 'Sensor 7';
+series7.strokeWidth = 3;
+series7.bullets.push(new am4charts.CircleBullet());
+series7.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series7.legendSettings.valueText = "{valueY}";
+
+var series8 = chart.series.push(new am4charts.LineSeries());
+series8.dataFields.valueY = "sersor8";
+series8.dataFields.categoryX = "time";
+series8.name = 'Sensor 8';
+series8.strokeWidth = 3;
+series8.bullets.push(new am4charts.CircleBullet());
+series8.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series8.legendSettings.valueText = "{valueY}";
+
+var series9 = chart.series.push(new am4charts.LineSeries());
+series9.dataFields.valueY = "sersor9";
+series9.dataFields.categoryX = "time";
+series9.name = 'Sensor 9';
+series9.strokeWidth = 3;
+series9.bullets.push(new am4charts.CircleBullet());
+series9.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series9.legendSettings.valueText = "{valueY}";
+
+var series10 = chart.series.push(new am4charts.LineSeries());
+series10.dataFields.valueY = "sersor10";
+series10.dataFields.categoryX = "time";
+series10.name = 'Sensor 10';
+series10.strokeWidth = 3;
+series10.bullets.push(new am4charts.CircleBullet());
+series10.tooltipText = "{name} : Time {categoryX}: Heat {valueY}";
+series10.legendSettings.valueText = "{valueY}";
+// Add chart cursor
+chart.cursor = new am4charts.XYCursor();
+chart.cursor.behavior = "zoomX";
+
+
+// Add legend
+chart.legend = new am4charts.Legend();
+
+}); // end am4core.ready()
+
+  });
+};
+retrievData();
+}
+}
+  else
+  {
+    alert("Plese first login");
+  }
+
+</script>
+
+<!-- HTML -->
+<div id="navbar" class="navbar">
+  <a id="home" href="#">Home</a>
+  <a id="heatmap" href="#">Heatmap</a>
+  <a id="everageheat" href="#">Everage Heat</a>
+  <a id="timeheat" href="#">Heat-Time Graph</a>
+  <a id="table" href="#">Table</a>
+  <a id="sim" href="#">Simulation</a>
+   
+  <div class="subnav">
+    <button class="subnavbtn">Sessions<i class="fa fa-caret-down"></i></button>
+    <div id="sessions" class="subnav-content">
+      
+    </div>
+  </div> 
+  
+  
+  <a id="createNewUser" href="#">Create New User</a>
+  <a id="login" href="#">Login</a>
+  <a id="logout" href="#">Logout</a>
+  <input placeholder="User Password" type="password" id="userPassword"/>
+  <input placeholder="User Name" type="text" id="userName"/>
+
+</div>
+
+<div id="chartdiv"></div>
